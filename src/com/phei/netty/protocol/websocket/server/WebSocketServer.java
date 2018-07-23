@@ -46,23 +46,16 @@ public class WebSocketServer {
 			protected void initChannel(SocketChannel ch)
 				throws Exception {
 			    ChannelPipeline pipeline = ch.pipeline();
-			    pipeline.addLast("http-codec",
-				    new HttpServerCodec());
-			    pipeline.addLast("aggregator",
-				    new HttpObjectAggregator(65536));
-			    ch.pipeline().addLast("http-chunked",
-				    new ChunkedWriteHandler());
-			    pipeline.addLast("handler",
-				    new WebSocketServerHandler());
+			    pipeline.addLast("http-codec", new HttpServerCodec());
+			    pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
+			    ch.pipeline().addLast("http-chunked", new ChunkedWriteHandler());
+			    pipeline.addLast("handler", new WebSocketServerHandler());
 			}
 		    });
 
 	    Channel ch = b.bind(port).sync().channel();
-	    System.out.println("Web socket server started at port " + port
-		    + '.');
-	    System.out
-		    .println("Open your browser and navigate to http://localhost:"
-			    + port + '/');
+	    System.out.println("Web socket server started at port " + port + '.');
+	    System.out.println("Open your browser and navigate to http://localhost:" + port + '/');
 
 	    ch.closeFuture().sync();
 	} finally {

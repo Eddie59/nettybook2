@@ -30,6 +30,7 @@ public class AsyncTimeServerHandler implements Runnable {
     private int port;
 
     CountDownLatch latch;
+    //异步的服务器通道
     AsynchronousServerSocketChannel asynchronousServerSocketChannel;
 
     public AsyncTimeServerHandler(int port) {
@@ -60,6 +61,7 @@ public class AsyncTimeServerHandler implements Runnable {
     }
 
     public void doAccept() {
+        //接收客户端
         asynchronousServerSocketChannel.accept(this, new AcceptCompletionHandler());
     }
 

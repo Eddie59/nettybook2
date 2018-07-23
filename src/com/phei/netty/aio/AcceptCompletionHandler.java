@@ -28,10 +28,11 @@ public class AcceptCompletionHandler implements
         CompletionHandler<AsynchronousSocketChannel, AsyncTimeServerHandler> {
 
     @Override
-    public void completed(AsynchronousSocketChannel result,
-                          AsyncTimeServerHandler attachment) {
+    public void completed(AsynchronousSocketChannel result, AsyncTimeServerHandler attachment) {
+        //每当成功接受一个新的连接时，再异步接收新的请求
         attachment.asynchronousServerSocketChannel.accept(attachment, this);
         ByteBuffer buffer = ByteBuffer.allocate(1024);
+        //读取客户端发来的消息
         result.read(buffer, buffer, new ReadCompletionHandler(result));
     }
 

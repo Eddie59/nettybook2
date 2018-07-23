@@ -28,8 +28,7 @@ import java.util.concurrent.CountDownLatch;
  * @version 1.0
  * @date 2014年2月16日
  */
-public class AsyncTimeClientHandler implements
-        CompletionHandler<Void, AsyncTimeClientHandler>, Runnable {
+public class AsyncTimeClientHandler implements CompletionHandler<Void, AsyncTimeClientHandler>, Runnable {
 
     private AsynchronousSocketChannel client;
     private String host;
@@ -48,7 +47,6 @@ public class AsyncTimeClientHandler implements
 
     @Override
     public void run() {
-
         latch = new CountDownLatch(1);
         client.connect(new InetSocketAddress(host, port), this, this);
         try {
@@ -73,9 +71,11 @@ public class AsyncTimeClientHandler implements
                 new CompletionHandler<Integer, ByteBuffer>() {
                     @Override
                     public void completed(Integer result, ByteBuffer buffer) {
+                        //没有写完，继续写
                         if (buffer.hasRemaining()) {
                             client.write(buffer, buffer, this);
                         } else {
+                            //读取服务器响应消息
                             ByteBuffer readBuffer = ByteBuffer.allocate(1024);
                             client.read(
                                     readBuffer,
@@ -85,8 +85,7 @@ public class AsyncTimeClientHandler implements
                                         public void completed(Integer result,
                                                               ByteBuffer buffer) {
                                             buffer.flip();
-                                            byte[] bytes = new byte[buffer
-                                                    .remaining()];
+                                            byte[] bytes = new byte[buffer.remaining()];
                                             buffer.get(bytes);
                                             String body;
                                             try {

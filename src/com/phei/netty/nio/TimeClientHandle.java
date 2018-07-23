@@ -39,6 +39,11 @@ public class TimeClientHandle implements Runnable {
 
     private volatile boolean stop;
 
+    /**
+     * 每次开启，相当于一台新的客户端连接到服务器
+     * @param host 客户端主机
+     * @param port 客户端接口
+     */
     public TimeClientHandle(String host, int port) {
         this.host = host == null ? "127.0.0.1" : host;
         this.port = port;
@@ -60,6 +65,9 @@ public class TimeClientHandle implements Runnable {
     @Override
     public void run() {
         try {
+            //服务器会收到请求，MultiplexerTimeServer中的Run会收到请求，
+            //(key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT 为True，
+            //收到新的chinnal，把新的chinnal注册到selecter的监视中
             doConnect();
         } catch (IOException e) {
             e.printStackTrace();
@@ -114,6 +122,7 @@ public class TimeClientHandle implements Runnable {
                     System.exit(1);
                 }
             }
+            //客户端接收服务器返回的信息
             if (key.isReadable()) {
                 ByteBuffer readBuffer = ByteBuffer.allocate(1024);
                 int readBytes = sc.read(readBuffer);
@@ -138,6 +147,7 @@ public class TimeClientHandle implements Runnable {
         // 如果直接连接成功，则注册到多路复用器上，发送请求消息，读应答
         if (socketChannel.connect(new InetSocketAddress(host, port))) {
             socketChannel.register(selector, SelectionKey.OP_READ);
+            //在channel上给服务器发信息，发完消息，用selector轮询查看channel上是否有服务器返回消息
             doWrite(socketChannel);
         } else {
             socketChannel.register(selector, SelectionKey.OP_CONNECT);
